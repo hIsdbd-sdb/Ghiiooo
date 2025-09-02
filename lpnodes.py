@@ -364,23 +364,6 @@ class Database:
 
     def close(self):
         self.conn.close()
-
-# Initialize bot with command prefix '/'
-class LpNodesbot(commands.Bot):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.db = Database(DB_FILE)
-        self.session = None
-        self.docker_client = None
-        self.system_stats = {
-            'cpu_usage': 0,
-            'memory_usage': 0,
-            'disk_usage': 0,
-            'network_io': (0, 0),
-            'last_updated': 0
-        }
-        self.my_persistent_views = {}
-
     async def setup_hook(self):
         self.session = aiohttp.ClientSession()
         try:
