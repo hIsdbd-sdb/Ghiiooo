@@ -49,8 +49,8 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 ADMIN_IDS = {int(id_) for id_ in os.getenv('ADMIN_IDS', '1210291131301101618').split(',') if id_.strip()}
 ADMIN_ROLE_ID = int(os.getenv('ADMIN_ROLE_ID', '1376177459870961694'))
-WATERMARK = "UnixNodes VPS Service"
-WELCOME_MESSAGE = "Welcome To UnixNodes! Get Started With Us!"
+WATERMARK = "LP NODES VPS Service"
+WELCOME_MESSAGE = "Welcome To LP NODES! Get Started With Us!"
 MAX_VPS_PER_USER = int(os.getenv('MAX_VPS_PER_USER', '3'))
 DEFAULT_OS_IMAGE = os.getenv('DEFAULT_OS_IMAGE', 'ubuntu:22.04')
 DOCKER_NETWORK = os.getenv('DOCKER_NETWORK', 'bridge')
@@ -100,7 +100,7 @@ RUN systemctl enable ssh && \\
 RUN echo '{welcome_message}' > /etc/motd && \\
     echo 'echo "{welcome_message}"' >> /home/{username}/.bashrc && \\
     echo '{watermark}' > /etc/machine-info && \\
-    echo 'unixnodes-{vps_id}' > /etc/hostname
+    echo 'lpnodes-{vps_id}' > /etc/hostname
 
 # Install additional useful packages
 RUN apt-get update && \\
@@ -621,7 +621,7 @@ async def build_custom_image(vps_id, username, root_password, user_password, bas
             f.write(dockerfile_content)
         
         # Build the image
-        image_tag = f"unixnodes/{vps_id.lower()}:latest"
+        image_tag = f"lpnodes/{vps_id.lower()}:latest"
         build_process = await asyncio.create_subprocess_exec(
             "docker", "build", "-t", image_tag, temp_dir,
             stdout=asyncio.subprocess.PIPE,
@@ -967,7 +967,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
             await ctx.send(f"❌ {owner.mention} already has the maximum number of VPS instances ({bot.db.get_setting('max_vps_per_user')})", ephemeral=True)
             return
 
-        status_msg = await ctx.send("🚀 Creating UnixNodes VPS instance... This may take a few minutes.")
+        status_msg = await ctx.send("🚀 Creating LP NODES VPS instance... This may take a few minutes.")
 
         memory_bytes = memory * 1024 * 1024 * 1024
         vps_id = generate_vps_id()
@@ -977,7 +977,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
         token = generate_token()
 
         if use_custom_image:
-            await status_msg.edit(content="🔨 Building custom Docker image...")
+            await status_msg.edit(content="🔨 Building custom  Docker image...")
             try:
                 image_tag = await build_custom_image(vps_id, username, root_password, user_password, os_image)
             except Exception as e:
@@ -990,14 +990,14 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
                     image_tag,
                     detach=True,
                     privileged=True,
-                    hostname=f"unixnodes-{vps_id}",
+                    hostname=f"lpnodes-{vps_id}",
                     mem_limit=memory_bytes,
                     cpu_period=100000,
                     cpu_quota=int(cpu * 100000),
                     cap_add=["ALL"],
                     network=DOCKER_NETWORK,
                     volumes={
-                        f'unixnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
+                        f'lpnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
                     },
                     restart_policy={"Name": "always"}
                 )
@@ -1020,7 +1020,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
                     tty=True,
                     network=DOCKER_NETWORK,
                     volumes={
-                        f'unixnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
+                        f'lpnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
                     },
                     restart_policy={"Name": "always"}
                 )
@@ -1039,7 +1039,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
                     tty=True,
                     network=DOCKER_NETWORK,
                     volumes={
-                        f'unixnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
+                        f'lpnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
                     },
                     restart_policy={"Name": "always"}
                 )
@@ -1095,7 +1095,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
         bot.db.add_vps(vps_data)
         
         try:
-            embed = discord.Embed(title="🎉 UnixNodes VPS Creation Successful", color=discord.Color.green())
+            embed = discord.Embed(title="🎉 LP NODES VPS Creation Successful", color=discord.Color.green())
             embed.add_field(name="🆔 VPS ID", value=vps_id, inline=True)
             embed.add_field(name="💾 Memory", value=f"{memory}GB", inline=True)
             embed.add_field(name="⚡ CPU", value=f"{cpu} cores", inline=True)
@@ -1109,7 +1109,7 @@ async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: disco
             embed.add_field(name="ℹ️ Note", value="This is a UnixNodes VPS instance. You can install and configure additional packages as needed.", inline=False)
             
             await owner.send(embed=embed)
-            await status_msg.edit(content=f"✅ UnixNodes VPS creation successful! VPS has been created for {owner.mention}. Check your DMs for connection details.")
+            await status_msg.edit(content=f"✅ LP NODES VPS creation successful! VPS has been created for {owner.mention}. Check your DMs for connection details.")
         except discord.Forbidden:
             await status_msg.edit(content=f"❌ I couldn't send a DM to {owner.mention}. Please ask them to enable DMs from server members.")
             
@@ -1257,7 +1257,7 @@ async def delete_vps(ctx, vps_id: str):
         
         bot.db.remove_vps(token)
         
-        await ctx.send(f"✅ UnixNodes VPS {vps_id} has been deleted successfully!")
+        await ctx.send(f"✅ LP NODES VPS {vps_id} has been deleted successfully!")
     except Exception as e:
         logger.error(f"Error in delete_vps: {e}")
         await ctx.send(f"❌ Error deleting VPS: {str(e)}")
@@ -1314,7 +1314,7 @@ Or use direct SSH:
 """.format(username=vps["username"]), inline=False)
         
         await ctx.author.send(embed=embed)
-        await ctx.send("✅ Connection details sent to your DMs! Use the Tmate command to connect to your UnixNodes VPS.", ephemeral=True)
+        await ctx.send("✅ Connection details sent to your DMs! Use the Tmate command to connect to your LP NODES VPS.", ephemeral=True)
         
     except discord.Forbidden:
         await ctx.send("❌ I couldn't send you a DM. Please enable DMs from server members.", ephemeral=True)
@@ -1952,7 +1952,7 @@ async def edit_vps(ctx, vps_id: str, memory: Optional[int] = None, cpu: Optional
                 vps['os_image'],
                 detach=True,
                 privileged=True,
-                hostname=f"unixnodes-{vps_id}",
+                hostname=f"lpnodes-{vps_id}",
                 mem_limit=memory_bytes,
                 cpu_period=100000,
                 cpu_quota=cpu_quota,
@@ -1961,7 +1961,7 @@ async def edit_vps(ctx, vps_id: str, memory: Optional[int] = None, cpu: Optional
                 tty=True,
                 network=DOCKER_NETWORK,
                 volumes={
-                    f'unixnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
+                    f'lpnodes-{vps_id}': {'bind': '/data', 'mode': 'rw'}
                 },
                 restart_policy={"Name": "always"}
             )
@@ -2653,4 +2653,5 @@ if __name__ == "__main__":
         bot.run(TOKEN)
     except Exception as e:
         logger.error(f"Bot crashed: {e}")
+
         traceback.print_exc()
