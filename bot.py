@@ -923,7 +923,7 @@ async def list_admins(ctx):
     disk="Disk space in GB",
     owner="User who will own the VPS",
     os_image="OS image to use",
-    use_custom_image="Use custom UnixNodes image (recommended)"
+    use_custom_image="Use custom LP NODES image (recommended)"
 )
 async def create_vps_command(ctx, memory: int, cpu: int, disk: int, owner: discord.Member, 
                            os_image: str = DEFAULT_OS_IMAGE, use_custom_image: bool = True):
@@ -2655,3 +2655,4 @@ if __name__ == "__main__":
         logger.error(f"Bot crashed: {e}")
 
         traceback.print_exc()
+
