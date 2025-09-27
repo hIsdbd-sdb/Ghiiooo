@@ -116,10 +116,6 @@ RUN apt-get update && \\
     apt-get clean && \\
     rm -rf /var/lib/apt/lists/*
 
-# Basic security
-RUN ufw allow ssh && \\
-    ufw --force enable
-
 # Configure fail2ban
 RUN systemctl enable fail2ban
 
@@ -2823,3 +2819,4 @@ if __name__ == "__main__":
         logger.error(f"Bot crashed: {e}")
 
         traceback.print_exc()
+
